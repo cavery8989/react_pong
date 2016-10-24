@@ -101,7 +101,7 @@ const Board = React.createClass({
     console.log(this.props.ballYPos);
     console.log(this.props.ballYVol);
     clearInterval(drawTimer);
-    drawTimer = setInterval(this.moveBall,16);
+    drawTimer = setInterval(this.moveBall,150);
 
     // 16.66 60fps
   },
