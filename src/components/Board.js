@@ -4,7 +4,7 @@ import Ball from './Ball';
 import {connect} from 'react-redux';
 import {HotKeys} from 'react-hotkeys';
 import { checkForContact } from '../helpers/ballHelpers';
-import { chooseDirection } from '../helpers/AIhelpers';
+import { chooseDirection } from '../helpers/AIHelpers';
 import actions from '../redux/actions/actions';
 
 const Styles = {
@@ -113,7 +113,7 @@ const Board = React.createClass({
   handleStart: function () {
     clearInterval(drawTimer);
     clearInterval(aITimer);
-    drawTimer = setInterval(this.moveBall,16.66);
+    drawTimer = setInterval(this.moveBall,19);
     aITimer = setInterval(this.moveAI, 18);
 
   },
