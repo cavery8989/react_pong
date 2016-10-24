@@ -18,7 +18,7 @@ actions.resetPaddleOneY = function () {
 
 actions.setPaddleTwoY = function (value) {
   return {
-    type: types.SET_P1_Y,
+    type: types.SET_P2_Y,
     value: value
   }
 };

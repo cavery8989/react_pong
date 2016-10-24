@@ -6,8 +6,7 @@ export function checkForContact (ballY, paddleY) {
   console.log('checking')
 
   const paddleHeight = 120;
-  const compensatedBallY = ballY + 120;
-  const ballRadius = 37.5;
-  const ballCenter = compensatedBallY + ballRadius;
+  const ballHeight = 75;
+  const ballCenter = ballY + (ballHeight / 2);
   return (ballCenter > paddleY && ballY < (paddleY + paddleHeight));
 }

@@ -3,8 +3,8 @@ import * as types from '../actions/types'
 const state = {
   xPos: 400,
   yPos: 200,
-  xVol: -4,
-  yVol: -4
+  xVol: -5,
+  yVol: -5
 };
 
 function ballReducer(initialState, action) {

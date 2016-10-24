@@ -1,7 +1,7 @@
 //  Paddles
-export const SET_P1_Y = 'SET_HEIGHT';
+export const SET_P1_Y = 'SET_P1_HEIGHT';
 export const RESET_P1_Y = 'RESET_HEIGHT';
-export const SET_P2_Y = 'SET_HEIGHT';
+export const SET_P2_Y = 'SET_P2_HEIGHT';
 export const RESET_P2_Y = 'RESET_HEIGHT';
 
 //  Ball

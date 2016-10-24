@@ -4,15 +4,18 @@ import Ball from './Ball';
 import {connect} from 'react-redux';
 import {HotKeys} from 'react-hotkeys';
 import { checkForContact } from '../helpers/ballHelpers';
+import { chooseDirection } from '../helpers/AIhelpers';
 import actions from '../redux/actions/actions';
 
 const Styles = {
   height: '500px',
   width: '750px',
   background: 'lightBlue',
+  position:'relative'
 };
 
 let drawTimer;
+let aITimer;
 
 const Board = React.createClass({
 
@@ -23,7 +26,7 @@ const Board = React.createClass({
     if (currentY >= 0) {
       let newY = currentY -= 10;
       newY = newY < 0 ? 0 : newY;
-      this.props.movePaddle(newY);
+      this.props.movePlayerPaddle(newY);
     }
   },
   handlePaddleDown: function () {
@@ -31,7 +34,7 @@ const Board = React.createClass({
     let currentY = this.props.paddleOneY;
     if (currentY < 500 - 120) {
       let newY = currentY += 8;
-      this.props.movePaddle(newY);
+      this.props.movePlayerPaddle(newY);
     }
   },
   moveBall: function () {
@@ -52,40 +55,37 @@ const Board = React.createClass({
       this.handleReset();
       return null;
     }
-
-
-
-
-
-    // Check for contact with paddle
-
-
-
-    //  Update Y pos
-
+    // Update Y
     let currentYPos = this.props.ballYPos;
     let yVol = this.props.ballYVol;
-
-    console.log(currentYPos);
-    console.log(yVol);
     let newYPos = currentYPos + yVol;
-    if(currentYPos <= -120 ){
+    if(currentYPos <= 0 ){
       newYPos = newYPos - (yVol * 2);
       this.props.setBallYVol(yVol * -1);
     }
-    if(newYPos >= 304){
+    if(newYPos + 75 >= 500){
       newYPos = newYPos - (yVol * 2);
       this.props.setBallYVol(yVol * -1);
     }
 
-    // Check for contact with paddle.
+    // Check for contact with paddle player.
 
     if(newXPos <= 20){
       // check for contact
-      let paddleY = this.props.paddleOneY;
-      if(checkForContact(newYPos, paddleY)){
-        console.log('returnd true-------------------------------------------------------------------------------');
-        newXPos = newXPos - (xVol*2);
+      let paddleOneY = this.props.paddleOneY;
+      if(checkForContact(newYPos, paddleOneY)){
+        newXPos = newXPos - xVol;
+        this.props.setBallXVol(xVol * -1);
+      }
+    }
+
+    // Check for contact with AI paddle.
+
+
+    if((newXPos + 75) >= (750 - 20)){
+      let paddleTwoY = this.props.paddleTwoY;
+      if(checkForContact(newYPos, paddleTwoY)){
+        newXPos = newXPos - xVol;
         this.props.setBallXVol(xVol * -1);
       }
     }
@@ -96,18 +96,31 @@ const Board = React.createClass({
 
   },
 
-  handleStart: function () {
-    console.log('START');
-    console.log(this.props.ballYPos);
-    console.log(this.props.ballYVol);
-    clearInterval(drawTimer);
-    drawTimer = setInterval(this.moveBall,150);
+  moveAI: function () {
+    let ballYVol = this.props.ballYVol;
+    let ballYPos = this.props.ballYPos;
+    let paddleYPos = this.props.paddleTwoY;
+    let direction = chooseDirection(ballYVol, ballYPos, paddleYPos);
+    let newPaddleYPos;
+    if(direction === 'up') {
+      newPaddleYPos = paddleYPos - 5;
+    } else if ( direction === 'down'){
+      newPaddleYPos = paddleYPos + 5;
+    }
+    this.props.moveAIPaddle(newPaddleYPos);
+  },
 
-    // 16.66 60fps
+  handleStart: function () {
+    clearInterval(drawTimer);
+    clearInterval(aITimer);
+    drawTimer = setInterval(this.moveBall,16.66);
+    aITimer = setInterval(this.moveAI, 18);
+
   },
 
   handleReset: function () {
     clearInterval(drawTimer);
+    clearInterval(aITimer);
     this.props.resetBall();
 
   },
@@ -128,7 +141,8 @@ const Board = React.createClass({
         <button onClick={this.handleStart}>Start</button>
         <button onClick={this.handleReset}>Reset</button>
         <div onClick={this.handleClick} onKeyPress={this.handleInput} style={Styles} className="board">
-          <Paddle yPos={this.props.paddleOneY}/>
+          <Paddle xPos={0} yPos={this.props.paddleOneY}/>
+          <Paddle xPos={750 - 20} yPos={this.props.paddleTwoY}/>
           <Ball xPos={this.props.ballXPos} yPos={this.props.ballYPos}/>
         </div>
 
@@ -141,6 +155,7 @@ const Board = React.createClass({
 function mapStateToProps(state) {
   return {
     paddleOneY: state.paddleReducer.paddleOneY,
+    paddleTwoY: state.paddleReducer.paddleTwoY,
     gameRunning: state.gameStateReducer.running,
     ballXPos: state.ballReducer.xPos,
     ballYPos: state.ballReducer.yPos,
@@ -151,8 +166,11 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    movePaddle: function (value) {
+    movePlayerPaddle: function (value) {
       dispatch(actions.setPaddleOneY(value));
+    },
+    moveAIPaddle: function (value) {
+      dispatch(actions.setPaddleTwoY(value));
     },
     setBallXPos: function (value) {
       dispatch(actions.setBallXPos(value));
