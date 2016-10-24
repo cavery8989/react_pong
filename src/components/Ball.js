@@ -9,7 +9,7 @@ const Ball = React.createClass({
       width: '75px',
       height: '75px',
       borderRadius: '100%',
-      position: 'relative',
+      position: 'absolute',
       top: yPos,
       left: xPos,
       background: 'red'
